@@ -1,0 +1,16 @@
+### The car is able to drive at least 4.32 miles without incident
+    The car is able to drive itself without any incident for more than 4.32 miles
+    1. In the beginning, I set the total waypoints to 50 suggested by the walkthrough and create the x, y values based on the current position. I also set the distance between waypoints to 0.4 which translate to 48 mph. line 379-386
+       2. The car drove at the very high jerk. To reduce jerk and let the car drive, I started with the leftover waypoints from the last execution cycle and used the spline library to fit the path to create a smooth path and create new waypoints. Line 307-377
+    3. To avoid collision with the car in front, I use sensor fusion information to make sure if it's safe to change lanes, if it's safe on both sides, change to the left lane, otherwise change to the lane whichever is safe. If neither lane is safe, slow down. Line 248-296
+### The car drives according to the speed limit.
+    Line 294-296, if the speed is lower than 49.5 mph, which is close to the speed limit, and if the car in front is not too close, the speed will increase until it reaches 49.5 and remains at the speed until the car in front is too close.
+### Max Acceleration and Jerk are not Exceeded
+    Line 307-377, I used the Spline library to generate a smooth path based on previous waypoints, so the car follows a smooth path without exceeding Jerk. 
+    In addition, line 292 and 295 make sure the acceleration and deceleration does not exceed the comfortable level
+### Car does not have collisions
+    Based on the sensor fusion data, in line 259, when the car in front is less than 30 meters away from the car, it will set the front_car_too_close to true. Line 266-283, it checks if the cars in front and behind the car, but in the other lanes are less than 20 meters ahead or behind. If true, it means the lanes are not clear to change lanes. If the lanes are not clear, slow down, otherwise, switch to whichever is clear, preferably the left lane if both lanes are clear.
+### The car stays in its lane, except for the time between changing lanes
+    The Frenet coordinates make the process easier to keep the car in the lane. In line 329-331, the width of each lane is 4 meters, so the d value equals to (2+4*lane), which is the middle of the lane.
+### The car is able to change lanes
+    Line 287-291. When changing lane is needed, it checks left lane first since it's the fast traffic lane, if the left lane is clear and the car is actually in lane 1 or lane 2, it then will change to the left lane. Otherwise, it will check the right lane, if the lane is clear and the car is in lane 0 and lane 1, it then will switch to the right, lane++. In lane 239-331, the changed lane value will impact on the new waypoints, which means the car will start from the previous waypoints and smoothly change lanes by following the new waypoints.

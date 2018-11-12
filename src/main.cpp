@@ -202,7 +202,7 @@ int main() {
   }
 
   int lane = 1;
-  double ref_vel = 49.5;
+  double ref_vel = 0;
   
   h.onMessage([&ref_vel, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &lane](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
@@ -242,8 +242,60 @@ int main() {
           	auto sensor_fusion = j[1]["sensor_fusion"];
 			int prev_size = previous_path_x.size();
           
-          	json msgJson;
-
+          	if(prev_size > 0){
+            	car_s = end_path_s;
+            }
+			bool front_car_too_close = false;
+          	bool left_car_too_close = false;
+          	bool right_car_too_close = false;
+          	for(int i = 0; i < sensor_fusion.size(); i++){
+            	float d = sensor_fusion[i][6];
+              	double vx = sensor_fusion[i][3];
+                double vy = sensor_fusion[i][4];
+                double check_speed = sqrt(vx*vx+vy*vy);
+                double check_car_s = sensor_fusion[i][5];
+                  	
+                check_car_s += ((double)prev_size*.02*check_speed);
+              	if(d < (2 + 4*lane + 2) && d > (2+4*lane-2)){
+                  	if((check_car_s > car_s) && ((check_car_s - car_s) < 30)){
+                      //car is too close to the car in front
+                      	front_car_too_close = true;
+                    }
+                }
+              
+              	if(d < (2+4*(lane-1) +2) && d > (2+4*(lane-1) - 2)){
+                	if(
+                      (check_car_s > car_s && (check_car_s - car_s) < 20) ||
+                      (check_car_s <= car_s && (car_s - check_car_s) < 20)
+                      ){
+                      		//car is too close to the car in the left lane
+                      		left_car_too_close = true;
+                    	}
+                }
+              	if(d < (2+4*(lane+1) +2) && d > (2+4*(lane+1) - 2)){
+                	if(
+                      (check_car_s > car_s && (check_car_s - car_s) < 20) ||
+                      (check_car_s <= car_s && (car_s - check_car_s) < 20)
+                      ){
+                      		//car is too close to the car in the right lane
+                      		right_car_too_close = true;
+                    	}
+                }
+            }
+          
+          	if(front_car_too_close) {
+              	if (!left_car_too_close && lane > 0) {
+                	lane--;
+                }else if(!right_car_too_close && lane < 2){
+                	lane++;
+                }else{
+              		ref_vel -= .224;
+                }
+            } else if(ref_vel < 49.5) {
+            	ref_vel += .244;
+            }
+          
+            json msgJson;
           	vector<double> next_x_vals;
           	vector<double> next_y_vals;
 			vector<double> ptsx;
@@ -324,7 +376,7 @@ int main() {
               	next_y_vals.push_back(y_point);
             }
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
-//           	double dist_inc = 0.5;
+//             double dist_inc = 0.4;
 //             for(int i = 0; i < 50; i++){
 //                 double s = car_s + (i+1)*dist_inc;
 //                 double d = 1.5 * 4;
