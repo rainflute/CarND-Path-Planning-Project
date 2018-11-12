@@ -1,8 +1,8 @@
 ### The car is able to drive at least 4.32 miles without incident
-    The car is able to drive itself without any incident for more than 4.32 miles
-    1. In the beginning, I set the total waypoints to 50 suggested by the walkthrough and create the x, y values based on the current position. I also set the distance between waypoints to 0.4 which translate to 48 mph. line 379-386
-    2. The car drove at the very high jerk. To reduce jerk and let the car drive,     \I started with the leftover waypoints from the last execution cycle and used the spline library to fit the path to create a smooth path and create new waypoints. Line 30
-    3. To avoid collision with the car in front, I use sensor fusion information to make sure if it's safe to change lanes, if it's safe on both sides, change to the left lane, otherwise change to the lane whichever is safe. If neither lane is safe, slow down. Line 248-296
+The car is able to drive itself without any incident for more than 4.32 miles
+1. In the beginning, I set the total waypoints to 50 suggested by the walkthrough and create the x, y values based on the current position. I also set the distance between waypoints to 0.4 which translate to 48 mph. line 379-386
+2. The car drove at the very high jerk. To reduce jerk and let the car drive,     \I started with the leftover waypoints from the last execution cycle and used the spline library to fit the path to create a smooth path and create new waypoints. Line 30
+3. To avoid collision with the car in front, I use sensor fusion information to make sure if it's safe to change lanes, if it's safe on both sides, change to the left lane, otherwise change to the lane whichever is safe. If neither lane is safe, slow down. Line 248-296
 ### The car drives according to the speed limit.
 Line 294-296, if the speed is lower than 49.5 mph, which is close to the speed limit, and if the car in front is not too close, the speed will increase until it reaches 49.5 and remains at the speed until the car in front is too close.
 ### Max Acceleration and Jerk are not Exceeded
